@@ -2,8 +2,8 @@ import { Types } from "mongoose";
 import { NodeModel } from "../model/schemas/index.js";
 
 export const createNode = async (
-  parentId?: Types.ObjectId,
-  info?: { title?: string; icon?: string }
+  parentId: Types.ObjectId | undefined = undefined,
+  info: { title?: string; icon?: string } | undefined = undefined
 ) => {
   return await NodeModel.create({ parentId, info });
 };
@@ -13,6 +13,7 @@ export const getNode = async (id: Types.ObjectId) => {
 };
 
 export const getAllNodes = async () => {
+  console.log("Fetching all nodes from the database...");
   return await NodeModel.find();
 };
 

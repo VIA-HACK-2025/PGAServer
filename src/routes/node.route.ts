@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 import { Types } from "mongoose";
 import {
@@ -9,19 +9,28 @@ import {
 } from "../db/index.js";
 
 export async function nodeRouter(fastify: FastifyInstance) {
-  fastify.post("/", async (request, reply) => {
-    const { parentId, info } = request.body as {
-      parentId?: Types.ObjectId;
-      info?: { title?: string; icon?: string };
-    };
-    try {
-      const node = await createNode(parentId, info);
-      reply.status(201).send(node);
-    } catch (error) {
-      reply.status(500).send({ error: "Failed to create node" });
-      console.error("Error creating node:", error);
+  fastify.post(
+    "/",
+    async (
+      request: FastifyRequest<{
+        Body: {
+          parentId?: Types.ObjectId;
+          info?: { title?: string; icon?: string };
+        };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const parentId = request.body?.parentId;
+      const info = request.body?.info || { title: "", icon: "" };
+      try {
+        const node = await createNode(parentId, info);
+        reply.status(201).send(node);
+      } catch (error) {
+        reply.status(500).send({ error: "Failed to create node" });
+        console.error("Error creating node:", error);
+      }
     }
-  });
+  );
 
   fastify.get("/", async (request, reply) => {
     try {
